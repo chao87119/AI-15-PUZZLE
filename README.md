@@ -12,10 +12,10 @@ Input： A state of random layout of 1, 2, 3, …, 15, blank.
 
 goal state  
 
- 1  2  3 4  
-12 13 14 5  
-11 15  * 6  
-10  9  8 7  
+ 1　 　2　 3　4    
+12　13　14　5  
+11　 15　 *　 6  
+10　 9　 8　  7  
 
 Output for each algorithm：  
 (a) The number of movements (state changes) from the initial state to the goal state.  
