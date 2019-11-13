@@ -691,8 +691,8 @@ def main():
     goal_state=np.array(([[1,2,3,4],[12,13,14,5],[11,15,'*',6],[10,9,8,7]]),dtype=np.str)    #goal
     goal=goal_state
     initial=Node(initial_state,0)
-    #frontier.append(Node(initial_state,0))
-    #IDS(initial_state,goal,initial)              #IDS      結果
+    frontier.append(Node(initial_state,0))
+    IDS(initial_state,goal,initial)              #IDS      結果
     UCS(initial_state,goal,initial)              #UCS      結果
     GREEDY(initial_state,goal,initial)           #GREEDY   結果
     ASTAR(initial_state,goal,initial)            #ASTAR    結果
