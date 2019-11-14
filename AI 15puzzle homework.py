@@ -34,7 +34,8 @@ explain the strategy
 import numpy as np
 
 frontier=[]                 
-expanded_node=[]           # 展開過的state
+expanded_node=[]           # 正在展開的state
+state_changes=0            # 記錄展開過多少個state
 MaxnumState=0              # maximun number of states ever saved in memory
 find=False                 # 如果找到goal,find = True
 Rbfsmax=0                  # 記錄rbfs最多的記憶的node
@@ -154,6 +155,7 @@ class Iterative_Deepening_Search:
     def add_frontier(self):
         global frontier
         global expanded_node
+        global state_changes
         start = self.start
         if (start.state==self.goal).all():   #如果找到goal
             path=[]
@@ -168,7 +170,7 @@ class Iterative_Deepening_Search:
             for j in range(0,len(path)):
                 if isinstance(path[j].state,np.ndarray)!=True:
                     path[j].state=np.array(path[j].state).reshape(4,4)
-                print('The number of movements:',j)
+                print('move:',j)
                 print(path[j])
             return True   
         frontier.append(start)               #沒找到goal,則加入forntier
@@ -183,7 +185,9 @@ class Iterative_Deepening_Search:
         global frontier
         global expanded_node
         global MaxnumState
+        global state_changes
         expanded_node.append(frontier[-1])
+        state_changes+=1
         del frontier[-1]
         expanded_node[-1].expanded = True
         expanded_node[-1].add_children()
@@ -221,6 +225,7 @@ class Uniform_Cost_Search:
     def pop_off(self): 
         global frontier
         global expanded_node
+        global state_changes
         if (frontier[0].state==self.goal).all():    #在pop_off的時候才做goal test
             path=[]
             path.append(frontier[0])  
@@ -235,11 +240,12 @@ class Uniform_Cost_Search:
             for j in range(0,len(path)):
                 if isinstance(path[j].state,np.ndarray)!=True:
                     path[j].state=np.array(path[j].state).reshape(4,4)
-                print('The number of movements:',j)
+                print('move:',j)
                 print(path[j])
             return True   
         else:
             expanded_node.append(frontier[0])
+            state_changes+=1
             del frontier[0]
         
     def priority_queue(self):
@@ -291,7 +297,7 @@ class Geedy_Bestfirst_Search:
             for j in range(0,len(path)):
                 if isinstance(path[j].state,np.ndarray)!=True:
                     path[j].state=np.array(path[j].state).reshape(4,4)
-                print('The number of movements:',j)
+                print('move:',j)
                 print(path[j])
             return True   
         frontier.append(start)
@@ -308,6 +314,7 @@ class Geedy_Bestfirst_Search:
         global frontier
         global expanded_node
         global MaxnumState
+        global state_changes
         gmin=100000
         for k in range(0,len(frontier)):           #在frontier中,找g(n)最小者展開
             g=heuristic(frontier[k])
@@ -315,6 +322,7 @@ class Geedy_Bestfirst_Search:
                 add=k
                 gmin=g
         expanded_node.append(frontier[add])
+        state_changes+=1
         del frontier[add]
         expanded_node[-1].expanded = True
         expanded_node[-1].add_children()
@@ -352,7 +360,7 @@ class Astar:
             for j in range(0,len(path)):
                 if isinstance(path[j].state,np.ndarray)!=True:
                     path[j].state=np.array(path[j].state).reshape(4,4)
-                print('The number of movements:',j)
+                print('move:',j)
                 print(path[j])
             return True   
         frontier.append(start)
@@ -371,6 +379,7 @@ class Astar:
         global frontier
         global expanded_node
         global MaxnumState
+        global state_changes
         fmin=100000
         for k in range(0,len(frontier)):           #在frontier中,找g(n)最小者展開
             g=heuristic(frontier[k])               #g為heuristic
@@ -379,6 +388,7 @@ class Astar:
                 add=k
                 fmin=f
         expanded_node.append(frontier[add])
+        state_changes+=1
         del frontier[add]
         expanded_node[-1].expanded = True
         expanded_node[-1].add_children()
@@ -434,7 +444,7 @@ class Rbfs:
                 for j in range(0,len(path)):
                     if isinstance(path[j].state,np.ndarray)!=True:
                         path[j].state=np.array(path[j].state).reshape(4,4)
-                    print('The number of movements:',j)
+                    print('move:',j)
                     print(path[j])
                 return True
            
@@ -452,8 +462,10 @@ class Rbfs:
         global expanded_node
         global MaxnumState
         global Rbfsmax
+        global state_changes
         if len(frontier)==1 and frontier[-1].level==0 :        #第一次的時候直接展開
             expanded_node.append(frontier[-1])
+            state_changes+=1
             del frontier[-1]
             expanded_node[-1].expanded = True
             expanded_node[-1].add_children()
@@ -488,6 +500,7 @@ class Rbfs:
         else:                         
             add.keep=fsecond        
             expanded_node.append(add)                         #展開add
+            state_changes+=1
             if expanded_node[-1].children==[]:
                expanded_node[-1].add_children()
             expanded_node[-1].expanded=True
@@ -504,9 +517,13 @@ def IDS(initial_state,goal,initial):
     print('####################')
     global find
     global MaxnumState
+    global state_changes
     for i in range(1,10):                          #limit層數
+        expanded_node.clear()
         if find==True:
             MaxnumState=MaxnumState+i-1-Iterative_Deepening_Search.delete
+            print('The number of state changes:',state_changes)
+            state_changes=0
             print('Max states ever saved:',MaxnumState)
             print('############################')
             print('\n')      
@@ -516,8 +533,9 @@ def IDS(initial_state,goal,initial):
         if i==9:                                  #9層後解不出來...
            print('unsolvable') 
         if (initial_state==goal).all():
-            print('The number of movements:',0)
+            print('move:',0)
             print(initial)
+            print('The number of state changes:',0)
             print('Max states ever saved:',1)
             print('############################')
             print('\n')
@@ -542,10 +560,12 @@ def UCS(initial_state,goal,initial):
     print('####################')
     global find
     global MaxnumState
+    global state_changes
     frontier.append(Node(initial_state,0))
     if (initial_state==goal).all():
-        print('The number of movements:',0)
+        print('move:',0)
         print(initial)
+        print('The number of state changes:',0)
         print('Max states ever saved:',1)
         print('############################')
         print('\n')      
@@ -553,11 +573,14 @@ def UCS(initial_state,goal,initial):
     while len(expanded_node)==0 or expanded_node[-1].level<8 :
         if find==True:
            MaxnumState=len(Uniform_Cost_Search.movement)+1
+           print('The number of state changes:',state_changes)
+           state_changes=0
            print('Max states ever saved:',MaxnumState)
            print('############################')
            print('\n')      
            find=False
            MaxnumState=0
+           Uniform_Cost_Search.movement=[]
            expanded_node.clear()
            frontier.clear()
            return None
@@ -575,10 +598,12 @@ def GREEDY(initial_state,goal,initial):
     print('####################')
     global find
     global MaxnumState
+    global state_changes
     frontier.append(Node(initial_state,0))
     if (initial_state==goal).all():
-        print('The number of movements:',0)
+        print('move:',0)
         print(initial)
+        print('The number of state changes:',0)
         print('Max states ever saved:',1)
         print('############################')
         print('\n')      
@@ -586,6 +611,8 @@ def GREEDY(initial_state,goal,initial):
     while len(expanded_node)==0 or len(expanded_node)<100 :
         if find==True:
            MaxnumState=len(Geedy_Bestfirst_Search.movement)+1
+           print('The number of state changes:',state_changes)
+           state_changes=0
            print('Max states ever saved:',MaxnumState)
            print('############################')
            print('\n')      
@@ -608,10 +635,12 @@ def ASTAR(initial_state,goal,initial):
     print('####################')
     global find
     global MaxnumState
+    global state_changes
     frontier.append(Node(initial_state,0))
     if (initial_state==goal).all():
-        print('The number of movements:',0)
+        print('move:',0)
         print(initial)
+        print('The number of state changes:',0)
         print('Max states ever saved:',1)
         print('############################')
         print('\n')      
@@ -619,6 +648,8 @@ def ASTAR(initial_state,goal,initial):
     while len(expanded_node)==0 or len(expanded_node)<100 :
         if find==True:
            MaxnumState=len(Astar.movement)+1
+           print('The number of state changes:',state_changes)
+           state_changes=0
            print('Max states ever saved:',MaxnumState)
            print('############################')
            print('\n')      
@@ -642,11 +673,13 @@ def RBFS(initial_state,goal,initial):
     global find
     global MaxnumState
     global Rbfsmax 
+    global state_changes
     initial.keep=100000
     frontier.append(initial)
     if (initial_state==goal).all():
-        print('The number of movements:',0)
+        print('move:',0)
         print(initial)
+        print('The number of state changes:',0)
         print('Max states ever saved:',1)
         print('############################')
         print('\n')      
@@ -654,6 +687,8 @@ def RBFS(initial_state,goal,initial):
     while len(expanded_node)==0 or len(expanded_node)<30 :
         if find==True:
            MaxnumState=Rbfsmax+1
+           print('The number of state changes:',state_changes)
+           state_changes=0
            print('Max states ever saved:',MaxnumState)
            print('############################')
            print('\n')      
