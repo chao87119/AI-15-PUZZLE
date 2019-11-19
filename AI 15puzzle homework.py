@@ -531,7 +531,13 @@ def IDS(initial_state,goal,initial):
             MaxnumState=0
             break
         if i==9:                                  #9層後解不出來...
-           print('unsolvable') 
+           print('unsolvable')
+           print('############################')
+           expanded_node.clear()
+           frontier.clear()  
+           MaxnumState=0
+           state_changes=0
+           break
         if (initial_state==goal).all():
             print('move:',0)
             print(initial)
@@ -552,7 +558,7 @@ def IDS(initial_state,goal,initial):
            else:
                break   
         expanded_node.clear()
-        frontier.clear()     
+        frontier.clear()
 
 
 def UCS(initial_state,goal,initial):
@@ -587,7 +593,9 @@ def UCS(initial_state,goal,initial):
         else:
            Uniform_Cost_Search(initial,goal)
     print('unsolvable') 
+    print('############################')
     find=False
+    state_changes=0
     MaxnumState=0
     Uniform_Cost_Search.movement=[]
     expanded_node.clear()
@@ -626,6 +634,7 @@ def GREEDY(initial_state,goal,initial):
     print('unsolvable') 
     find=False
     MaxnumState=0
+    state_changes=0
     Geedy_Bestfirst_Search.movement=[]
     expanded_node.clear()
     frontier.clear()
@@ -663,6 +672,7 @@ def ASTAR(initial_state,goal,initial):
     print('unsolvable') 
     find=False
     MaxnumState=0
+    state_changes=0
     Astar.movement=[]
     expanded_node.clear()
     frontier.clear()
@@ -704,6 +714,7 @@ def RBFS(initial_state,goal,initial):
     print('unsolvable') 
     find=False
     MaxnumState=0
+    state_changes=0
     Rbfs.movement=[]
     Rbfsmax=0
     expanded_node.clear()
